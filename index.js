@@ -2,9 +2,10 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-app.get("/webhook", (req, res) => {
-  const VERIFY_TOKEN = "my_verify_token";
+// Your verify token as a string
+const VERIFY_TOKEN = "09092644023"; // This must match exactly with the one entered in Facebook
 
+app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
@@ -14,8 +15,10 @@ app.get("/webhook", (req, res) => {
       console.log("WEBHOOK_VERIFIED");
       res.status(200).send(challenge);
     } else {
-      res.sendStatus(403);
+      res.sendStatus(403); // Token mismatch
     }
+  } else {
+    res.sendStatus(400); // Missing query parameters
   }
 });
 
@@ -32,7 +35,7 @@ app.post("/webhook", (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Webhook server is running on port ${PORT}`);
 });
